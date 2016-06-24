@@ -82,8 +82,8 @@ ALfloat listenerOri[]={0.0,0.0,1.0,
 
 // now the position and speed of the sound source
 ALfloat source0Pos[]={ -2.0, 0.0, 0.0};
-ALfloat source0Vel[]={ 0.0, 0.0, 0.0};
 
+ALfloat source0Vel[]={ 0.0, 0.0, 0.0};
 // buffers for openal stuff
 ALuint  buffer[NUM_BUFFERS];
 ALuint  source[NUM_SOURCES];
@@ -248,7 +248,7 @@ void initModel() {
         case 0x000000:
             break;
         case 0xff0000:
-            modelLoaded = C3DObject_Load_New("../../models/dolphins.obj", &models[modelos_carregados].model);
+            modelLoaded = C3DObject_Load_New("../../models/OogieBoogie.obj", &models[modelos_carregados].model);
             break;
         case 0x00ff00:
             modelLoaded = C3DObject_Load_New("../../models/f-16.obj", &models[modelos_carregados].model);
@@ -285,7 +285,7 @@ void initTexture(void)
 {
     printf ("\nLoading texture..\n");
     // Load a texture object (256x256 true color)
-    bits = LoadDIBitmap("tiledbronze.bmp", &info);
+    bits = LoadDIBitmap("../../res/stones.bmp", &info);
     if (bits == (GLubyte *)0) {
 		printf ("Error loading texture!\n\n");
 		return;
@@ -318,8 +318,8 @@ void initTexture(void)
 	glTexParameteri(type, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(type, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    //glTexImage2D(type, 0, 4, info->bmiHeader.biWidth, info->bmiHeader.biHeight,
-      //            0, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
+    glTexImage2D(type, 0, 4, info->bmiHeader.biWidth, info->bmiHeader.biHeight,
+                  0, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
 
 
     printf("Textura %d\n", texture);

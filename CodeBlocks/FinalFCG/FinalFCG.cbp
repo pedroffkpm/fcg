@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="FPS" />
+		<Option title="FinalFCG" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -17,9 +17,9 @@
 					<Add directory="../include" />
 				</Compiler>
 				<Linker>
-					<Add library="..\lib\OpenGL32.Lib" />
-					<Add library="..\lib\GlU32.Lib" />
-					<Add library="..\lib\glut32.lib" />
+					<Add library="../lib/OpenGL32.Lib" />
+					<Add library="../lib/GlU32.Lib" />
+					<Add library="../lib/glut32.lib" />
 					<Add directory="../lib" />
 				</Linker>
 			</Target>
@@ -36,9 +36,9 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="..\lib\OpenGL32.Lib" />
-					<Add library="..\lib\GlU32.Lib" />
-					<Add library="..\lib\glut32.lib" />
+					<Add library="../lib/OpenGL32.Lib" />
+					<Add library="../lib/GlU32.Lib" />
+					<Add library="../lib/glut32.lib" />
 					<Add directory="../lib" />
 				</Linker>
 			</Target>
@@ -47,12 +47,12 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Linker>
-			<Add library="..\lib\OpenGL32.Lib" />
-			<Add library="..\lib\GlU32.Lib" />
-			<Add library="..\lib\glut32.lib" />
-			<Add library="..\lib\OpenAL32.lib" />
-			<Add library="..\lib\EFX-Util.lib" />
-			<Add library="..\lib\alut.lib" />
+			<Add library="../lib/OpenGL32.Lib" />
+			<Add library="../lib/GlU32.Lib" />
+			<Add library="../lib/glut32.lib" />
+			<Add library="../lib/OpenAL32.lib" />
+			<Add library="../lib/EFX-Util.lib" />
+			<Add library="../lib/alut.lib" />
 		</Linker>
 		<Unit filename="../../src/Texture.cpp" />
 		<Unit filename="../../src/Texture.h" />
@@ -63,7 +63,11 @@
 		<Unit filename="../../src/glm.cpp" />
 		<Unit filename="../../src/glm.h" />
 		<Unit filename="../../src/glmimg.cpp" />
+		<Unit filename="../../src/keyboard.cpp" />
+		<Unit filename="../../src/keyboard.h" />
 		<Unit filename="../../src/main.cpp" />
+		<Unit filename="../../src/window.cpp" />
+		<Unit filename="../../src/window.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
