@@ -52,6 +52,7 @@ void setViewport(GLint left, GLint right, GLint bottom, GLint top);
 void updateState();
 void renderFloor();
 void updateCam();
+void initPlayer();
 
 int mainWindowId = 0;
 
@@ -84,9 +85,9 @@ float maxSpeed = 0.25f;
 // parte de código extraído de "texture.c" por Michael Sweet (OpenGL SuperBible)
 // texture buffers and stuff
 int i;                       /* Looping var */
-//BITMAPINFO	*info;           /* Bitmap information */
-//GLubyte	    *bits;           /* Bitmap RGB pixels */
-//GLubyte     *ptr;            /* Pointer into bit buffer */
+BITMAPINFO	*info;           /* Bitmap information */
+GLubyte	    *bits;           /* Bitmap RGB pixels */
+GLubyte     *ptr;            /* Pointer into bit buffer */
 GLubyte	    *rgba;           /* RGBA pixel buffer */
 GLubyte	    *rgbaptr;        /* Pointer into RGBA buffer */
 GLubyte     temp;            /* Swapping variable */
@@ -98,20 +99,19 @@ GLuint      texture;         /* Texture object */
 bool crouched = false;
 bool running = false;
 bool jumping = false;*/
-float jumpSpeed = 0.06;
 float gravity = 0.004;
-float heightLimit = 0.2;
 
 
-float backgrundColor[4] = {0.0f,0.0f,0.0f,1.0f};
+float backgrundColor[4] = {0.8f,0.9f,1.0f,1.0f};
 
 int modelos_carregados = 0;
 struct object
 {
     GLMmodel *model;
-    int x;
-    int z;
-} models[500];
+    float x;
+    float z;
+    float y;
+} models[500], player;
 
 // Aux function to load the object using GLM and apply some functions
 bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
@@ -138,31 +138,26 @@ bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
 }
 
 
-
 /**
 Atualiza a posição e orientação da camera
 */
 void updateCam() {
 
-	gluLookAt(posX,posY,posZ,
-		posX + sin(roty*PI/180),posY + cos(rotx*PI/180),posZ -cos(roty*PI/180),
-		0.0,1.0,0.0);
+	gluLookAt(player.x, player.y, player.z,
+		player.x + sin(roty*PI/180), 0.2, player.z - cos(roty*PI/180),
+		0.0,1.0, 0.0);
 
-    GLfloat light_position0[] = {posX, posY, posZ, 1.0 };
+
+    GLfloat light_position0[] = {player.x, 0.2, player.z, 1.0 };
     glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
 
 	GLfloat direcao[] = {sin(roty*PI/180), cos(rotx*PI/180), -cos(roty*PI/180)};
     glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, direcao);
-
-	angulo+=5;
-    GLfloat light_position1[] = {0.6*cos(angulo*M_PI/180.0), 0.5, 0.6*sin(angulo*M_PI/180.0)};
-    glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
 }
 
 void initLight() {
     glEnable(GL_LIGHTING );
 	glEnable( GL_LIGHT0 );
-	glEnable( GL_LIGHT1 );
 
 	GLfloat light_ambient[] = { backgrundColor[0], backgrundColor[1], backgrundColor[2], backgrundColor[3] };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -176,15 +171,67 @@ void initLight() {
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
     glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 35.0);
 
-	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
-
 }
 
+void initModel() {
+	printf("Loading models.. \n");
+	bits = LoadDIBitmap("map.bmp", &info);
+	if (bits == (GLubyte *)0) {
+		printf ("Error loading models!\n\n");
+		return;
+	}
 
+	int xpos = 0;
+    int zpos = (int)info->bmiHeader.biHeight - 1;
+    bool modelLoaded = false;
+	i = info->bmiHeader.biWidth * info->bmiHeader.biHeight;
 
+    for(ptr = bits; i > 0; i--, ptr += 3)
+    {
+        int color = (ptr[2] << 16) + (ptr[1] << 8) + ptr[0];
+        switch(color)
+        {
+        case 0x000000:
+            break;
+        case 0xff0000:
+            modelLoaded = C3DObject_Load_New("../../models/OogieBoogie.obj", &models[modelos_carregados].model);
+            break;
+        case 0x00ff00:
+            modelLoaded = C3DObject_Load_New("../../models/f-16.obj", &models[modelos_carregados].model);
+            break;
+        case 0x0000ff:
+            modelLoaded = C3DObject_Load_New("../../models/flowers.obj", &models[modelos_carregados].model);
+            break;
+        case 0xffff00:
+            modelLoaded = C3DObject_Load_New("../../models/flowers.obj", &models[modelos_carregados].model);
+        default:
+            printf("Unidentified color.");
+        }
+
+	if (modelLoaded){
+		models[modelos_carregados].x = xpos;
+		models[modelos_carregados].z = zpos;
+		modelos_carregados++;
+		modelLoaded = false;
+		}
+	xpos++;
+	if(xpos ==(int)info->bmiHeader.biWidth){
+        xpos = 0;
+        zpos--;
+	}
+    }
+	printf("Models ok. \n \n \n");
+}
+
+void initPlayer() {
+    for(int i = 0; i < 32; i++)
+    for (int j = 0; j < 32; j++) {
+        printf("%d", mapXZ[i][j]);
+    }
+    player.x = 4.0f;
+    player.y = 0.4f;
+    player.z = 4.0f;
+}
 /**
 Initialize
 */
@@ -199,11 +246,13 @@ void mainInit() {
 
     initTexture();
 
-	initModel();
+	//initModel();
+
+	initPlayer();
 
 	initLight();
 
-	enableFog();
+	//enableFog();
 }
 
 /**
@@ -213,7 +262,7 @@ void initTexture(void)
 {
     printf ("\nLoading texture..\n");
     // Load a texture object (256x256 true color)
-    bits = LoadDIBitmap("../../res/stones.bmp", &info);
+    bits = LoadDIBitmap("../../res/grass.bmp", &info);
     if (bits == (GLubyte *)0) {
 		printf ("Error loading texture!\n\n");
 		return;
@@ -279,12 +328,12 @@ void renderScene() {
 	int cont;
 	for (cont=0; cont<modelos_carregados; cont++)
 	{
-
 		glPushMatrix();
         glTranslatef(GLfloat(models[cont].x - 3.5), 0.5, GLfloat(models[cont].z - 3.5));
         glmDraw(models[cont].model, GLM_SMOOTH | GLM_MATERIAL);
 		glPopMatrix();
 	}
+
 
     // binds the bmp file already loaded to the OpenGL parameters
     glBindTexture(type, texture);
@@ -293,6 +342,42 @@ void renderScene() {
 }
 
 void updateState() {
+    int x = round(player.x);
+    int z = round(player.z);
+
+    if (mapXZ[x][z] == 0) {
+        printf("Morreu");
+        initPlayer();
+    }
+
+
+
+    if (leftPressed && !turningRight) {
+        turningLeft = true;
+	}
+
+	if (rightPressed && !turningLeft) {
+		turningRight = true;
+	}
+
+	if (turningLeft) {
+        turning -= 10.0;
+        roty -= 10.0;
+        if (turning == -90) {
+            turningLeft = false;
+            turning = 0;
+        }
+	}
+
+    if (turningRight) {
+        turning += 10.0;
+        roty += 10.0;
+        if (turning == 90) {
+            turningRight = false;
+            turning = 0;
+        }
+	}
+
 
 	if (upPressed || downPressed) {
 
@@ -300,11 +385,11 @@ void updateState() {
 			speedZ = -0.05 * cos(roty*PI/180);
 
         if (upPressed) {
-            posX += speedX;
-            posZ += speedZ;
+            player.x += speedX;
+            player.z += speedZ;
         } else {
-            posX -= speedX;
-            posZ -= speedZ;
+            player.x -= speedX;
+            player.z -= speedZ;
         }
 
 	}
@@ -319,28 +404,6 @@ void mainRender() {
 	glFlush();
 	glutPostRedisplay();
 	Sleep(30);
-}
-
-/**
-Handles events from the mouse right button menu
-*/
-void mainHandleMouseRightButtonMenuEvent(int option) {
-	switch (option) {
-		case 1 :
-			exit(0);
-			break;
-		default:
-			break;
-	}
-}
-
-/**
-Create mouse button menu
-*/
-void mainCreateMenu() {
-	glutCreateMenu(mainHandleMouseRightButtonMenuEvent);
-	glutAddMenuEntry("Quit", 1);
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 

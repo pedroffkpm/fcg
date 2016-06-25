@@ -6,14 +6,6 @@ extern int windowWidth;
 extern int windowHeight;
 
 
-//PLAYER
-
-extern float posX;
-extern float posY;
-extern float posZ;
-extern float posYOffset;
-
-
 /**
 Screen position
 */

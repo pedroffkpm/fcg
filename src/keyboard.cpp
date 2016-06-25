@@ -7,20 +7,27 @@ bool rightPressed = false;
 bool leftPressed = false;
 bool upPressed = false;
 bool downPressed = false;
+bool turningRight = false;
+bool turningLeft = false;
+float turning = 0;
 
 void onKeyDown(unsigned char key, int x, int y) {
 	//printf("%d \n", key);
 	switch (key) {
-		case 119: //w
+		case 'W':
+        case 'w':
 			upPressed = true;
 			break;
-		case 115: //s
+        case 'S':
+        case 's':
 			downPressed = true;
 			break;
-		case 97: //a
+        case 'A':
+        case 'a':
 			leftPressed = true;
 			break;
-		case 100: //d
+        case 'D':
+        case 'd':
 			rightPressed = true;
 			break;
 		default:
@@ -33,16 +40,20 @@ Key release event handler
 */
 void onKeyUp(unsigned char key, int x, int y) {
 	switch (key) {
-			case 119: //w
+        case 'W':
+        case 'w':
 			upPressed = false;
 			break;
-		case 115: //s
+        case 'S':
+        case 's':
 			downPressed = false;
 			break;
-		case 97: //a
+        case 'A':
+        case 'a':
 			leftPressed = false;
 			break;
-		case 100: //d
+        case 'D':
+        case 'd':
 			rightPressed = false;
 			break;
 		default:

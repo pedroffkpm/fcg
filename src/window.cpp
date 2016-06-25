@@ -3,9 +3,7 @@
 
 #include "window.h"
 //PLAYER
-float posX = 0.0f;
-float posY = 0.4f;
-float posZ = 2.0f;
+
 /**
 Screen dimensions
 */
@@ -26,7 +24,7 @@ void setWindow() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(posX, posY, posZ, posX, posY, posZ, 0.0,1.0,0.0);
+	//gluLookAt(posX, posY, posZ, posX, posY, posZ, 0.0,1.0,0.0);
 }
 
 void setViewport(GLint left, GLint right, GLint bottom, GLint top) {
