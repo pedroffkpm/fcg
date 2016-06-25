@@ -1,15 +1,21 @@
-#include <iostream>
-#include <GL/gl.h>
-#include <glut.h>
 #include <windows.h>
+#include <iostream>
+
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <GL/gl.h>
+#include <GL/glut.h>
+
 #include <math.h>
 #include <cmath>
 
+
 #include "glm.h"
 #include "keyboard.h"
+
 #include "window.h"
+#include "maps.h"
 #include "models.h"
 //openal (sound lib)
 #include <al/alut.h>
@@ -73,14 +79,14 @@ float headPosAux = 0.0f;
 
 float maxSpeed = 0.25f;
 
-float planeSize = 8.0f;
+//float planeSize = 8.0f;
 
 // parte de código extraído de "texture.c" por Michael Sweet (OpenGL SuperBible)
 // texture buffers and stuff
 int i;                       /* Looping var */
-BITMAPINFO	*info;           /* Bitmap information */
-GLubyte	    *bits;           /* Bitmap RGB pixels */
-GLubyte     *ptr;            /* Pointer into bit buffer */
+//BITMAPINFO	*info;           /* Bitmap information */
+//GLubyte	    *bits;           /* Bitmap RGB pixels */
+//GLubyte     *ptr;            /* Pointer into bit buffer */
 GLubyte	    *rgba;           /* RGBA pixel buffer */
 GLubyte	    *rgbaptr;        /* Pointer into RGBA buffer */
 GLubyte     temp;            /* Swapping variable */

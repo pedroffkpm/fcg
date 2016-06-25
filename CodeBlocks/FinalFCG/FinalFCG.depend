@@ -975,3 +975,103 @@
 1466806683 c:\users\pedro\desktop\fcg\fcg\src\models.h
 	<stdio.h>
 
+1466883481 source:c:\users\matheus\fcg\src\bitmap.c
+	"bitmap.h"
+	<stdio.h>
+	<stdlib.h>
+	<errno.h>
+
+1466883481 c:\users\matheus\fcg\src\bitmap.h
+	<GL/glut.h>
+	<windows.h>
+	<wingdi.h>
+
+1466883481 c:\users\matheus\fcg\codeblocks\include\gl\glut.h
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1466883481 c:\users\matheus\fcg\codeblocks\include\gl\gl.h
+
+1466883481 c:\users\matheus\fcg\codeblocks\include\gl\glu.h
+	<stddef.h>
+	<GL/gl.h>
+
+1466883481 source:c:\users\matheus\fcg\src\glm.cpp
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	"glm.h"
+
+1466883481 c:\users\matheus\fcg\src\glm.h
+	<GLUT/glut.h>
+	<GL/gl.h>
+	<GL/glut.h>
+
+1466883481 source:c:\users\matheus\fcg\src\glmimg.cpp
+	<string.h>
+	<math.h>
+	"Texture.h"
+	<windows.h>
+	<GL/gl.h>
+	"glm.h"
+
+1466883481 c:\users\matheus\fcg\src\texture.h
+	<windows.h>
+	<windowsx.h>
+	<stdlib.h>
+	<stdio.h>
+	<GL/glut.h>
+	<math.h>
+
+1466883481 source:c:\users\matheus\fcg\src\keyboard.cpp
+	"keyboard.h"
+
+1466883481 c:\users\matheus\fcg\src\keyboard.h
+
+1466885015 source:c:\users\matheus\fcg\src\main.cpp
+	<windows.h>
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<GL/gl.h>
+	<GL/glut.h>
+	<math.h>
+	<cmath>
+	"glm.h"
+	"keyboard.h"
+	"window.h"
+	"maps.h"
+	"models.h"
+	<al/alut.h>
+	"bitmap.h"
+
+1466883481 c:\users\matheus\fcg\src\window.h
+
+1466883481 c:\users\matheus\fcg\src\models.h
+	<stdio.h>
+
+1466883481 c:\users\matheus\fcg\codeblocks\include\al\alut.h
+	<al/alc.h>
+	<al/al.h>
+	<OpenAL/alc.h>
+	<OpenAL/al.h>
+	<AL/al.h>
+	<AL/alc.h>
+
+1466883481 c:\users\matheus\fcg\codeblocks\include\al\alc.h
+
+1466883481 c:\users\matheus\fcg\codeblocks\include\al\al.h
+
+1466883481 source:c:\users\matheus\fcg\src\texture.cpp
+	"Texture.h"
+
+1466883481 source:c:\users\matheus\fcg\src\window.cpp
+	<GL/gl.h>
+	<glut.h>
+	"window.h"
+
+1466884890 c:\users\matheus\fcg\src\maps.h
+

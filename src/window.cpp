@@ -1,5 +1,5 @@
 #include <GL/gl.h>
-#include <glut.h>
+#include <GL/glut.h>
 
 #include "window.h"
 //PLAYER
