@@ -10,6 +10,7 @@
 #include "glm.h"
 #include "keyboard.h"
 #include "window.h"
+#include "models.h"
 //openal (sound lib)
 #include <al/alut.h>
 //bitmap class to load bitmaps for textures
@@ -30,7 +31,7 @@
 void mainInit();
 void initSound();
 void initTexture();
-void initModel();
+
 void initLight();
 void enableFog();
 void createGLUI();
@@ -73,26 +74,6 @@ float headPosAux = 0.0f;
 float maxSpeed = 0.25f;
 
 float planeSize = 8.0f;
-
-// more sound stuff (position, speed and orientation of the listener)
-ALfloat listenerPos[]={0.0,0.0,4.0};
-ALfloat listenerVel[]={0.0,0.0,0.0};
-ALfloat listenerOri[]={0.0,0.0,1.0,
-						0.0,1.0,0.0};
-
-// now the position and speed of the sound source
-ALfloat source0Pos[]={ -2.0, 0.0, 0.0};
-
-ALfloat source0Vel[]={ 0.0, 0.0, 0.0};
-// buffers for openal stuff
-ALuint  buffer[NUM_BUFFERS];
-ALuint  source[NUM_SOURCES];
-ALuint  environment[NUM_ENVIRONMENTS];
-ALsizei size,freq;
-ALenum  format;
-ALvoid  *data;
-
-
 
 // parte de código extraído de "texture.c" por Michael Sweet (OpenGL SuperBible)
 // texture buffers and stuff
@@ -217,66 +198,7 @@ void mainInit() {
 	initLight();
 
 	enableFog();
-
-	printf("w - andar \n");
-	printf("s - ir pra tras \n");
-	printf("mouse - direcao \n");
-	printf("r - correr \n");
-	printf("c - abaixar \n");
-	printf("espaco - pular \n");
-
 }
-
-void initModel() {
-	printf("Loading models.. \n");
-	bits = LoadDIBitmap("map.bmp", &info);
-	if (bits == (GLubyte *)0) {
-		printf ("Error loading models!\n\n");
-		return;
-	}
-
-	int xpos = 0;
-    int zpos = (int)info->bmiHeader.biHeight - 1;
-    bool modelLoaded = false;
-	i = info->bmiHeader.biWidth * info->bmiHeader.biHeight;
-
-    for(ptr = bits; i > 0; i--, ptr += 3)
-    {
-        int color = (ptr[2] << 16) + (ptr[1] << 8) + ptr[0];
-        switch(color)
-        {
-        case 0x000000:
-            break;
-        case 0xff0000:
-            modelLoaded = C3DObject_Load_New("../../models/OogieBoogie.obj", &models[modelos_carregados].model);
-            break;
-        case 0x00ff00:
-            modelLoaded = C3DObject_Load_New("../../models/f-16.obj", &models[modelos_carregados].model);
-            break;
-        case 0x0000ff:
-            modelLoaded = C3DObject_Load_New("../../models/flowers.obj", &models[modelos_carregados].model);
-            break;
-        case 0xffff00:
-            modelLoaded = C3DObject_Load_New("../../models/flowers.obj", &models[modelos_carregados].model);
-        default:
-            printf("Unidentified color.");
-        }
-
-	if (modelLoaded){
-		models[modelos_carregados].x = xpos;
-		models[modelos_carregados].z = zpos;
-		modelos_carregados++;
-		modelLoaded = false;
-		}
-	xpos++;
-	if(xpos ==(int)info->bmiHeader.biWidth){
-	xpos = 0;
-	zpos--;
-	}
-    }
-	printf("Models ok. \n \n \n");
-}
-
 
 /**
 Initialize the texture using the library bitmap
@@ -339,51 +261,6 @@ void enableFog(void)
     glFogf(GL_FOG_END,100);
 }
 
-void renderFloor() {
-	// set things up to render the floor with the texture
-	glShadeModel(GL_SMOOTH);
-	glEnable(type);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	glPushMatrix();
-
-    glTranslatef(-(float)planeSize/2.0f, 0.0f, -(float)planeSize/2.0f);
-
-	float textureScaleX = 10.0;
-	float textureScaleY = 10.0;
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    int xQuads = 10;
-    int yQuads = 10;
-    int zQuads = 10;
-    for (int i = 0; i < xQuads; i++) {
-        for (int j = 0; j < zQuads; j++) {
-            glBegin(GL_QUADS);
-                glTexCoord2f(1.0f, 0.0f);   // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(i * (float)planeSize/xQuads, 0.0f, (j+1) * (float)planeSize/zQuads);
-
-                glTexCoord2f(0.0f, 0.0f);  // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f((i+1) * (float)planeSize/xQuads, 0.0f, (j+1) * (float)planeSize/zQuads);
-
-                glTexCoord2f(0.0f, 1.0f);  // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f((i+1) * (float)planeSize/xQuads, 0.0f, j * (float)planeSize/zQuads);
-
-                glTexCoord2f(1.0f, 1.0f);  // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(i * (float)planeSize/xQuads, 0.0f, j * (float)planeSize/zQuads);
-
-            glEnd();
-        }
-
-    }
-
-	glDisable(type);
-
-
-	glPopMatrix();
-}
 
 void renderScene() {
 	glClearColor(backgrundColor[0],backgrundColor[1],backgrundColor[2],backgrundColor[3]);

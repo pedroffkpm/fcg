@@ -932,7 +932,7 @@
 1466715642 source:c:\users\pedro\desktop\fcg\fcg\src\texture.cpp
 	"Texture.h"
 
-1466796516 source:c:\users\pedro\desktop\fcg\fcg\src\main.cpp
+1466806666 source:c:\users\pedro\desktop\fcg\fcg\src\main.cpp
 	<iostream>
 	<GL/gl.h>
 	<glut.h>
@@ -944,6 +944,7 @@
 	"glm.h"
 	"keyboard.h"
 	"window.h"
+	"models.h"
 	<al/alut.h>
 	"bitmap.h"
 
@@ -970,4 +971,7 @@
 	<GL/gl.h>
 	<glut.h>
 	"window.h"
+
+1466806683 c:\users\pedro\desktop\fcg\fcg\src\models.h
+	<stdio.h>
 
