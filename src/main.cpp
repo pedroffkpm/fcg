@@ -46,11 +46,6 @@ void initEnemies();
 
 int mainWindowId = 0;
 
-float roty = 0.0f;
-float rotx = 90.0f;
-float speedX = 0.0f;
-float speedY = 0.0f;
-float speedZ = 0.0f;
 
 int i;                       /* Looping var */
 BITMAPINFO	*info;           /* Bitmap information */
@@ -73,6 +68,9 @@ struct object
     float x;
     float z;
     float y;
+    float speedX = 0.0f;
+    float speedZ = 0.0f;
+    float roty = 0.0f;
     bool alive = true;
 } enemies[4], player;
 
@@ -109,14 +107,14 @@ void updateCam()
 
     if(cam == 0)
     {
-        gluLookAt(player.x + 0.05f * sin(roty*PI/180), 0.9, player.z - 0.05f * cos(roty*PI/180),
-                  player.x + sin(roty*PI/180), 0.6, player.z - cos(roty*PI/180),
+        gluLookAt(player.x + 0.05f * sin(player.roty*PI/180), 0.9, player.z - 0.05f * cos(player.roty*PI/180),
+                  player.x + sin(player.roty*PI/180), 0.6, player.z - cos(player.roty*PI/180),
                   0.0,1.0, 0.0);
     }
     if(cam == 1)
     {
-        gluLookAt(player.x - 3.0f * sin(roty*PI/180), player.y + 1.0f, player.z + 3.0f * cos(roty*PI/180),
-                  player.x + sin(roty*PI/180), 0.9f, player.z - cos(roty*PI/180),
+        gluLookAt(player.x - 3.0f * sin(player.roty*PI/180), player.y + 1.0f, player.z + 3.0f * cos(player.roty*PI/180),
+                  player.x + sin(player.roty*PI/180), 0.9f, player.z - cos(player.roty*PI/180),
                   0.0,1.0, 0.0);
     }
     if (cam == 2)
@@ -153,6 +151,8 @@ void initEnemies()
                 enemies[cont].x = x;
                 enemies[cont].y = 0.48f;
                 enemies[cont].z = z;
+                enemies[cont].speedX = 0.07f;
+                enemies[cont].speedZ = -0.07f;
                 cont++;
             }
 
@@ -318,6 +318,84 @@ void initTextures()
     glTexImage2D(type, 0, 4, info->bmiHeader.biWidth, info->bmiHeader.biHeight,
                  0, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
 
+    printf ("\nLoading dirt texture..\n");
+    // Load a texture object (256x256 true color)
+    bits = LoadDIBitmap("../../res/dirt.bmp", &info);
+    if (bits == (GLubyte *)0)
+    {
+        printf ("Error loading texture!\n\n");
+        return;
+    }
+    // Figure out the type of texture
+    if (info->bmiHeader.biHeight == 1)
+        type = GL_TEXTURE_1D;
+    else
+        type = GL_TEXTURE_2D;
+
+    // Create and bind a texture object
+    glGenTextures(1, &dirt);
+    glBindTexture(type, dirt);
+
+    // Create an RGBA image
+    rgba = (GLubyte *)malloc(info->bmiHeader.biWidth * info->bmiHeader.biHeight * 4);
+
+    i = info->bmiHeader.biWidth * info->bmiHeader.biHeight;
+    for( rgbaptr = rgba, ptr = bits;  i > 0; i--, rgbaptr += 4, ptr += 3)
+    {
+        rgbaptr[0] = ptr[2];     // windows BMP = BGR
+        rgbaptr[1] = ptr[1];
+        rgbaptr[2] = ptr[0];
+        rgbaptr[3] = (ptr[0] + ptr[1] + ptr[2]) / 3;
+    }
+
+    // Set texture parameters
+    glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(type, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(type, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+    glTexImage2D(type, 0, 4, info->bmiHeader.biWidth, info->bmiHeader.biHeight,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
+
+    printf ("\nLoading water texture..\n");
+    // Load a texture object (256x256 true color)
+    bits = LoadDIBitmap("../../res/water.bmp", &info);
+    if (bits == (GLubyte *)0)
+    {
+        printf ("Error loading texture!\n\n");
+        return;
+    }
+    // Figure out the type of texture
+    if (info->bmiHeader.biHeight == 1)
+        type = GL_TEXTURE_1D;
+    else
+        type = GL_TEXTURE_2D;
+
+    // Create and bind a texture object
+    glGenTextures(1, &water);
+    glBindTexture(type, water);
+
+    // Create an RGBA image
+    rgba = (GLubyte *)malloc(info->bmiHeader.biWidth * info->bmiHeader.biHeight * 4);
+
+    i = info->bmiHeader.biWidth * info->bmiHeader.biHeight;
+    for( rgbaptr = rgba, ptr = bits;  i > 0; i--, rgbaptr += 4, ptr += 3)
+    {
+        rgbaptr[0] = ptr[2];     // windows BMP = BGR
+        rgbaptr[1] = ptr[1];
+        rgbaptr[2] = ptr[0];
+        rgbaptr[3] = (ptr[0] + ptr[1] + ptr[2]) / 3;
+    }
+
+    // Set texture parameters
+    glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(type, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(type, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+    glTexImage2D(type, 0, 4, info->bmiHeader.biWidth, info->bmiHeader.biHeight,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
+
     printf("Textures ok.\n\n");
 }
 
@@ -329,9 +407,11 @@ void checkCollisions()
         colisorX = round(enemies[i].x);
         colisorZ = round(enemies[i].z);
 
-        if(round(player.x) == colisorX && round(player.z) == colisorZ){
+        if(round(player.x) == colisorX && round(player.z) == colisorZ)
             player.alive = false;
-            }
+
+         if (mapXZ[colisorX][colisorZ] == 0)
+        enemies[i].alive = false;
     }
 }
 
@@ -390,11 +470,12 @@ void renderScene()
     int cont;
     for (cont=0; cont<enemiesLoaded; cont++)
     {
-        if(enemies[cont].alive == true)
+        if(enemies[cont].alive)
         {
             glPushMatrix();
             glTranslatef(GLfloat(enemies[cont].x), GLfloat (enemies[cont].y), GLfloat(enemies[cont].z));
             glScalef(0.55,0.55,0.55);
+            glRotatef(-(enemies[cont].roty+180), 0.0, 1.0, 0.0);
             glmDraw(enemies[cont].model, GLM_SMOOTH | GLM_MATERIAL);
             glPopMatrix();
         }
@@ -403,7 +484,7 @@ void renderScene()
     glPushMatrix();
     glTranslatef(GLfloat(player.x), GLfloat(player.y), GLfloat(player.z));
     glScalef(0.5, 0.5, 0.5);
-    glRotatef(-(roty+180), 0.0, 1.0, 0.0);
+    glRotatef(-(player.roty+180), 0.0, 1.0, 0.0);
     glmDraw(player.model, GLM_SMOOTH | GLM_MATERIAL);
     glPopMatrix();
 
@@ -417,11 +498,113 @@ void renderScene()
 
 
     renderFloor();
+    renderWater();
+}
+
+
+void moveEnemies()
+{
+    int decision;
+    for (i = 0; i<enemiesLoaded; i++)
+    {
+        if(enemies[i].alive){
+        enemies[i].speedX = 0.07 * sin(enemies[i].roty*PI/180);
+        enemies[i].speedZ = -0.07 * cos(enemies[i].roty*PI/180);
+        decision = rand() % 20;  //decision vai ser  baseado na IA
+        switch(decision)
+        {
+            break;
+        case 1: //vira à esquerda
+            enemies[i].roty -= 90.0;
+            break;
+        case 2: // vira à direita
+            enemies[i].roty += 90.0;
+        default: //demais casos, segue reto
+            enemies[i].x += enemies[i].speedX;
+            enemies[i].z += enemies[i].speedZ; //speedZ é negativa
+            break;
+        }
+        }
+    }
+
+}
+
+int floodFill(int floodMap[32][32], int x, int z, int target, int replacement) {
+    if (x >= 32 || z >= 32 || x < 0 || z < 0)
+        return 0;
+
+    if (floodMap[x][z] == replacement)
+        return 0;
+
+    if (floodMap[x][z] == target) {
+        floodMap[x][z] = replacement;
+        return 1 +
+                floodFill(floodMap, x, z-1, target, replacement) +
+                floodFill(floodMap, x+1, z, target, replacement) +
+                floodFill(floodMap, x, z+1, target, replacement) +
+                floodFill(floodMap, x-1, z, target, replacement);
+    }
+
+    return 0;
+}
+
+void updateAreas(int playerX, int playerZ) {
+    int newMap[32][32];
+
+    for(int x = 0; x < 32; x++) {
+        for (int z = 0; z < 32; z++) {
+            if (mapXZ[x][z] == 1 || mapXZ[x][z] == 4 || mapXZ[x][z] == 5)
+                newMap[x][z] = 1;
+            else if (mapXZ[x][z] == 2 || mapXZ[x][z] == 3)
+                newMap[x][z] = 2;
+            else newMap[x][z] = 0;
+        }
+    }
+
+    int tamArea;
+    int maxArea = 0;
+    int replacement = -1;
+    int maxReplacement = -1;
+    int numAreas = 0;
+
+    for(int x = 0; x < 32; x++) {
+        for (int z = 0; z < 32; z++) {
+            if (newMap[x][z] == 1) {
+                tamArea = floodFill(newMap, x, z, 1, replacement);
+                numAreas++;
+                if (tamArea > maxArea) {
+                    maxArea = tamArea;
+                    maxReplacement = replacement;
+                }
+                replacement--;
+            }
+        }
+    }
+
+    if (numAreas > 1) {
+        for(int x = 0; x < 32; x++) {
+            for (int z = 0; z < 32; z++) {
+                if (newMap[x][z] != maxReplacement && newMap[x][z] < 0) {
+                    mapXZ[x][z] = 0;
+                }
+                else { //ARRUMAR AQUI PARA TIRAR OS PINTOS
+                    if (newMap[x][z] == 2 && z - 1 > 0 && z + 1 < 32 && x - 1 > 0 && x + 1 < 32) {
+                        if (newMap[x][z-1] != maxReplacement && newMap[x][z-1] < 0)
+                        if (newMap[x][z+1] != maxReplacement && newMap[x][z+1] < 0)
+                        if (newMap[x-1][z] != maxReplacement && newMap[x-1][z] < 0)
+                        if (newMap[x+1][z] != maxReplacement && newMap[x+1][z] < 0)
+                            mapXZ[x][z] = 0;
+                        }
+                    }
+            }
+        }
+    }
+
 }
 
 void createCrack(int x, int z) {
-    double fX = sin(roty*PI/180);
-    double fZ = -1 * cos(roty*PI/180);
+    double fX = sin(player.roty*PI/180);
+    double fZ = -1 * cos(player.roty*PI/180);
 
     int facingX;
     int facingZ;
@@ -439,17 +622,22 @@ void createCrack(int x, int z) {
     else facingZ = 0;
 
     for (int i = 1; i < 31; i++) {
-        if (x + i*facingX >= 32 && z + i*facingZ >= 32)
+        if (x + i*facingX >= 32 && z + i*facingZ >= 32) {
+            updateAreas(x, z);
             return;
+        }
         else {
-            if (mapXZ[x + i*facingX][z + i*facingZ] == 0 || mapXZ[x + i*facingX][z + i*facingZ] == 2 || mapXZ[x + i*facingX][z + i*facingZ] == 3)
+            if (mapXZ[x + i*facingX][z + i*facingZ] == 0 || mapXZ[x + i*facingX][z + i*facingZ] == 2 || mapXZ[x + i*facingX][z + i*facingZ] == 3) {
+                updateAreas(x, z);
                 return;
+            }
             else {
                 mapXZ[x + i*facingX][z + i*facingZ] = 3;
             }
         }
 
     }
+    updateAreas(x, z);
         return;
 }
 
@@ -458,18 +646,25 @@ void updateState()
     int x = round(player.x);
     int z = round(player.z);
 
+     if (spacePressed && (!turningRight && !turningLeft)) {
+        if (mapXZ[x][z] == 2) {
+            createCrack(x, z);
+        }
+        spacePressed = false;
+    }
+    else spacePressed = false;
+
     checkCollisions();
 
     if (mapXZ[x][z] == 0)
     {
         player.alive = false;
-        printf("Morreu");
-        initPlayer();
     }
 
-     if (spacePressed && (!turningRight && !turningLeft)) {
-        printf("\n\n\nX: %d, Z:%d\n",x,z);
-        if (mapXZ[x][z] == 2) {
+    if (spacePressed && (!turningRight && !turningLeft))
+    {
+        if (mapXZ[x][z] == 2)
+        {
             createCrack(x, z);
         }
         spacePressed = false;
@@ -489,7 +684,7 @@ void updateState()
     if (turningLeft)
     {
         turning -= 10.0;
-        roty -= 10.0;
+        player.roty -= 10.0;
         if (turning == -90)
         {
             turningLeft = false;
@@ -500,7 +695,7 @@ void updateState()
     if (turningRight)
     {
         turning += 10.0;
-        roty += 10.0;
+        player.roty += 10.0;
         if (turning == 90)
         {
             turningRight = false;
@@ -512,21 +707,22 @@ void updateState()
     if (upPressed || downPressed)
     {
 
-        speedX = 0.1 * sin(roty*PI/180);
-        speedZ = -0.1 * cos(roty*PI/180);
+        player.speedX = 0.1 * sin(player.roty*PI/180);
+        player.speedZ = -0.1 * cos(player.roty*PI/180);
 
         if (upPressed)
         {
-            player.x += speedX;
-            player.z += speedZ;
+            player.x += player.speedX;
+            player.z += player.speedZ;
         }
         else
         {
-            player.x -= speedX;
-            player.z -= speedZ;
+            player.x -= player.speedX;
+            player.z -= player.speedZ;
         }
 
     }
+    moveEnemies();
 }
 
 /**
