@@ -11,6 +11,9 @@ bool turningRight = false;
 bool turningLeft = false;
 float turning = 0;
 
+bool changecam = false;
+int cam = 0;
+
 void onKeyDown(unsigned char key, int x, int y) {
 	//printf("%d \n", key);
 	switch (key) {
@@ -30,6 +33,15 @@ void onKeyDown(unsigned char key, int x, int y) {
         case 'd':
 			rightPressed = true;
 			break;
+        case 'V':
+        case 'v':
+            if(!changecam){
+            changecam = true;
+            cam++;
+            if(cam > 2)
+                cam = 0;
+            }
+            break;
 		default:
 			break;
 	}
@@ -56,6 +68,10 @@ void onKeyUp(unsigned char key, int x, int y) {
         case 'd':
 			rightPressed = false;
 			break;
+		case 'V':
+        case 'v':
+            changecam = false;
+            break;
 		default:
 			break;
 	}
