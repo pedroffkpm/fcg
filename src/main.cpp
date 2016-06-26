@@ -99,7 +99,7 @@ bool jumping = false;*/
 float gravity = 0.004;
 
 
-float backgrundColor[4] = {0.8f,0.9f,1.0f,1.0f};
+float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
 int modelos_carregados = 0;
 struct object
@@ -144,15 +144,15 @@ void updateCam()
 
     if(cam == 0)
     {
-        gluLookAt(player.x, player.y, player.z,
-                  player.x + sin(roty*PI/180), 0.2, player.z - cos(roty*PI/180),
+        gluLookAt(player.x + 0.05f * sin(roty*PI/180), 0.9, player.z - 0.05f * cos(roty*PI/180),
+                  player.x + sin(roty*PI/180), 0.6, player.z - cos(roty*PI/180),
                   0.0,1.0, 0.0);
     }
     if(cam == 1)
     {
-        gluLookAt(player.x, player.y + 0.5f, player.z - 0.5f,
-                  player.x + sin(roty*PI/180), 0.4, (player.z -0.5f) - cos(roty*PI/180),
-                  0.0,1.0, 0.0);
+       gluLookAt(player.x - 3.0f * sin(roty*PI/180), player.y + 1.0f, player.z + 3.0f * cos(roty*PI/180),
+                player.x + sin(roty*PI/180), 0.9f, player.z - cos(roty*PI/180),
+                0.0,1.0, 0.0);
     }
     if (cam == 2)
     {
@@ -166,26 +166,18 @@ void updateCam()
 void initLight()
 {
     glEnable(GL_LIGHTING );
-    glEnable( GL_LIGHT0 );
+    glEnable(GL_LIGHT0);
 
     GLfloat light_ambient[] = { backgrundColor[0], backgrundColor[1], backgrundColor[2], backgrundColor[3] };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-
-    GLfloat light_position0[] = {player.x, player.y, player.z, 1.0 };
+    GLfloat light_position0[] = { 4.0, 4.0, 3.0, 1.0 };
     glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
-    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 90.0);
-
-
-
-    GLfloat direcao[] = {sin(roty*PI/180), cos(rotx*PI/180), -cos(roty*PI/180)};
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, direcao);
-
 }
 
 void initModel()
@@ -252,7 +244,7 @@ void initPlayer()
                 player.z = z;
             }
 
-    player.y = 0.4f;
+    player.y = 0.49f;
 
     printf("Loading player.. \n");
 
@@ -416,7 +408,7 @@ void mainInit()
 
     initPlayer();
 
-    //initLight();
+    initLight();
 
     //enableFog();
 }
@@ -455,12 +447,13 @@ void renderScene()
     glPushMatrix();
     glTranslatef(GLfloat(player.x), GLfloat(player.y), GLfloat(player.z));
     glScalef(0.5, 0.5, 0.5);
+    glRotatef(-(roty+180), 0.0, 1.0, 0.0);
     glmDraw(player.model, GLM_SMOOTH | GLM_MATERIAL);
     glPopMatrix();
 
     glPushMatrix();
     glTranslatef(GLfloat(4), GLfloat(player.y), GLfloat(4));
-    glScalef(0.3, 0.3, 0.3);
+    glScalef(0.5, 0.5, 0.5);
     glmDraw(player.model, GLM_SMOOTH | GLM_MATERIAL);
     glPopMatrix();
 
