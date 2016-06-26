@@ -10,6 +10,7 @@ bool downPressed = false;
 bool turningRight = false;
 bool turningLeft = false;
 bool spacePressed = false;
+bool fPressed = false;
 float turning = 0;
 
 bool changecam = false;
@@ -42,6 +43,11 @@ void onKeyDown(unsigned char key, int x, int y) {
             if(cam > 2)
                 cam = 0;
             }
+            break;
+        case 'F':
+        case 'f':
+            if(!fPressed)
+                fPressed = true;
             break;
         case 32:
             if(!spacePressed)

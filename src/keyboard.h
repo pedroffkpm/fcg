@@ -8,6 +8,7 @@ extern bool turningLeft;
 extern bool spacePressed;
 extern float turning;
 extern bool changecam;
+extern bool fPressed;
 extern int cam;
 
 extern void onKeyDown(unsigned char key, int x, int y);

@@ -1134,12 +1134,12 @@
 	<GL/glut.h>
 	<math.h>
 
-1466919557 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\keyboard.cpp
+1466969413 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\keyboard.cpp
 	"keyboard.h"
 
-1466919557 c:\users\maria inez\desktop\documentos pedro\fcg\src\keyboard.h
+1466969413 c:\users\maria inez\desktop\documentos pedro\fcg\src\keyboard.h
 
-1466922211 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\maps.cpp
+1466968734 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\maps.cpp
 	<GL/gl.h>
 	<GL/glut.h>
 	"bitmap.h"

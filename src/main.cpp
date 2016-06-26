@@ -191,10 +191,11 @@ void initPlayer()
 
     if (!modelLoaded)
         printf("Erro ao carregar modelo!\n");
-    else {
-            printf("Player Model ok. \n \n \n");
-            player.alive = true;
-        }
+    else
+    {
+        printf("Player Model ok. \n \n \n");
+        player.alive = true;
+    }
 }
 
 /**
@@ -502,6 +503,36 @@ void renderScene()
     renderWater();
 }
 
+//int makeDecision()
+//{
+//    int decision;
+//    int enemfacX, enemfacZ, pfacX, pfacZ;
+//    float enemfX, enemfZ, pfX, pfZ;
+//
+//    double fX = sin(player.roty*PI/180);
+//    double fZ = -1 * cos(player.roty*PI/180);
+//
+//    int facingX;
+//    int facingZ;
+//
+//    if (fX < -0.5)
+//        facingX = -1;
+//    else if (fX > 0.5)
+//        facingX = 1;
+//    else facingX = 0;
+//
+//    if (fZ < -0.5)
+//        facingZ = -1;
+//    else if (fZ > 0.5)
+//        facingZ = 1;
+//    else facingZ = 0;
+//
+//    for(int i = 0; i<enemiesLoaded;i++)
+//        if(fabs(enemies[i].x - player.x) <= 4.0f)
+//
+//
+//    return decision;
+//}
 
 void moveEnemies()
 {
@@ -512,15 +543,17 @@ void moveEnemies()
         {
             enemies[i].speedX = 0.07 * sin(enemies[i].roty*PI/180);
             enemies[i].speedZ = -0.07 * cos(enemies[i].roty*PI/180);
-            decision = rand() % 20;  //decision vai ser  baseado na IA
+            decision = rand() % 100;  //decision vai ser  baseado na IA
             switch(decision)
             {
+            case 0: // fica parado
                 break;
             case 1: //vira à esquerda
                 enemies[i].roty -= 90.0;
                 break;
             case 2: // vira à direita
                 enemies[i].roty += 90.0;
+                break;
             default: //demais casos, segue reto
                 enemies[i].x += enemies[i].speedX;
                 enemies[i].z += enemies[i].speedZ; //speedZ é negativa
@@ -664,6 +697,36 @@ void createCrack(int x, int z)
     return;
 }
 
+void blowEnemy()
+{
+    double fX = sin(player.roty*PI/180);
+    double fZ = -1 * cos(player.roty*PI/180);
+
+    int facingX;
+    int facingZ;
+
+    if (fX < -0.5)
+        facingX = -1;
+    else if (fX > 0.5)
+        facingX = 1;
+    else facingX = 0;
+
+    if (fZ < -0.5)
+        facingZ = -1;
+    else if (fZ > 0.5)
+        facingZ = 1;
+    else facingZ = 0;
+
+    for(int r = 0; r < enemiesLoaded; r++)
+        if(enemies[r].alive){
+            if ((round(player.x + fX) == round(enemies[r].x)) && (abs(round(enemies[r].z) - round(player.z)) <= 4))
+                    enemies[r].z += 0.65f*facingX;
+
+            if ((round(player.z + fZ) == round(enemies[r].z)) && (abs(round(enemies[r].x) - round(player.x)) <= 4))
+                    enemies[r].x += 0.65*facingZ;
+    }
+}
+
 void updateState()
 {
     int x = round(player.x);
@@ -685,6 +748,9 @@ void updateState()
     {
         player.alive = false;
     }
+
+    if(fPressed)
+        blowEnemy();
 
     if (spacePressed && (!turningRight && !turningLeft))
     {
@@ -747,7 +813,7 @@ void updateState()
         }
 
     }
-    moveEnemies();
+    //moveEnemies();
 }
 
 /**
