@@ -1,7 +1,6 @@
 #include <windows.h>
 #include <iostream>
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/gl.h>
@@ -10,26 +9,17 @@
 #include <math.h>
 #include <cmath>
 
-
 #include "glm.h"
 #include "keyboard.h"
 
 #include "window.h"
 #include "maps.h"
 #include "models.h"
-//openal (sound lib)
-#include <al/alut.h>
 //bitmap class to load bitmaps for textures
 #include "bitmap.h"
 #pragma comment(lib, "OpenAL32.lib")
 #pragma comment(lib, "alut.lib")
 #define PI 3.14159265
-
-// sound stuff
-#define NUM_BUFFERS 1
-#define NUM_SOURCES 1
-#define NUM_ENVIRONMENTS 1
-
 #define SMOOTH 0
 #define SMOOTH_MATERIAL 1
 #define SMOOTH_MATERIAL_TEXTURE 2
@@ -37,7 +27,6 @@
 void mainInit();
 void initSound();
 void initTextures();
-
 void initLight();
 void enableFog();
 void createGLUI();
@@ -53,19 +42,12 @@ void updateState();
 void renderFloor();
 void updateCam();
 void initPlayer();
+void initEnemies();
 
 int mainWindowId = 0;
 
-double xOffset = -1.9;
-double yOffset = -1.3;
-int mouseLastX = 0;
-int mouseLastY = 0;
-
 float roty = 0.0f;
 float rotx = 90.0f;
-
-bool spacePressed = false;
-
 float speedX = 0.0f;
 float speedY = 0.0f;
 float speedZ = 0.0f;
@@ -78,37 +60,21 @@ GLubyte	    *rgba;           /* RGBA pixel buffer */
 GLubyte	    *rgbaptr;        /* Pointer into RGBA buffer */
 GLubyte     temp;            /* Swapping variable */
 
-int angulo = 0;
-/*
-variavel auxiliar pra dar variação na altura do ponto de vista ao andar.
-*/
-float headPosAux = 0.0f;
-
-float maxSpeed = 0.25f;
-
-//float planeSize = 8.0f;
-
 // parte de código extraído de "texture.c" por Michael Sweet (OpenGL SuperBible)
 // texture buffers and stuff
 
-
-/**
-bool crouched = false;
-bool running = false;
-bool jumping = false;*/
 float gravity = 0.004;
-
 
 float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
-int modelos_carregados = 0;
 struct object
 {
     GLMmodel *model;
     float x;
     float z;
     float y;
-} models[500], player;
+    bool alive = true;
+} enemies[4], player;
 
 // Aux function to load the object using GLM and apply some functions
 bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
@@ -135,7 +101,6 @@ bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
     return true;
 }
 
-
 /**
 Atualiza a posição e orientação da camera
 */
@@ -150,9 +115,9 @@ void updateCam()
     }
     if(cam == 1)
     {
-       gluLookAt(player.x - 3.0f * sin(roty*PI/180), player.y + 1.0f, player.z + 3.0f * cos(roty*PI/180),
-                player.x + sin(roty*PI/180), 0.9f, player.z - cos(roty*PI/180),
-                0.0,1.0, 0.0);
+        gluLookAt(player.x - 3.0f * sin(roty*PI/180), player.y + 1.0f, player.z + 3.0f * cos(roty*PI/180),
+                  player.x + sin(roty*PI/180), 0.9f, player.z - cos(roty*PI/180),
+                  0.0,1.0, 0.0);
     }
     if (cam == 2)
     {
@@ -172,66 +137,37 @@ void initLight()
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_position0[] = { 4.0, 4.0, 3.0, 1.0 };
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
-
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
 }
 
-void initModel()
+void initEnemies()
 {
-    printf("Loading models.. \n");
-    bits = LoadDIBitmap("map.bmp", &info);
-    if (bits == (GLubyte *)0)
+    int cont = 0;
+    for (int x = 0; x < 32; x++)
+        for (int z = 0; z < 32; z++)
+            if (mapXZ[x][z] == 5)
+            {
+                enemies[cont].x = x;
+                enemies[cont].y = 0.48f;
+                enemies[cont].z = z;
+                cont++;
+            }
+
+    for (int i = 0; i< enemiesLoaded; i++)
     {
-        printf ("Error loading models!\n\n");
-        return;
+        printf("Loading enemy %d.. \n", i);
+
+        bool modelLoaded = false;
+
+        modelLoaded = C3DObject_Load_New("../../models/OogieBoogie.obj", &enemies[i].model);
+
+        if (!modelLoaded)
+            printf("Erro ao carregar modelo!\n");
+        else printf("Enemy Model ok. \n \n \n");
     }
-
-    int xpos = 0;
-    int zpos = (int)info->bmiHeader.biHeight - 1;
-    bool modelLoaded = false;
-    i = info->bmiHeader.biWidth * info->bmiHeader.biHeight;
-
-    for(ptr = bits; i > 0; i--, ptr += 3)
-    {
-        int color = (ptr[2] << 16) + (ptr[1] << 8) + ptr[0];
-        switch(color)
-        {
-        case 0x000000:
-            break;
-        case 0xff0000:
-            modelLoaded = C3DObject_Load_New("../../models/OogieBoogie.obj", &models[modelos_carregados].model);
-            break;
-        case 0x00ff00:
-            modelLoaded = C3DObject_Load_New("../../models/f-16.obj", &models[modelos_carregados].model);
-            break;
-        case 0x0000ff:
-            modelLoaded = C3DObject_Load_New("../../models/flowers.obj", &models[modelos_carregados].model);
-            break;
-        case 0xffff00:
-            modelLoaded = C3DObject_Load_New("../../models/flowers.obj", &models[modelos_carregados].model);
-        default:
-            printf("Unidentified color.");
-        }
-
-        if (modelLoaded)
-        {
-            models[modelos_carregados].x = xpos;
-            models[modelos_carregados].z = zpos;
-            modelos_carregados++;
-            modelLoaded = false;
-        }
-        xpos++;
-        if(xpos ==(int)info->bmiHeader.biWidth)
-        {
-            xpos = 0;
-            zpos--;
-        }
-    }
-    printf("Models ok. \n \n \n");
 }
 
 void initPlayer()
@@ -245,9 +181,8 @@ void initPlayer()
             }
 
     player.y = 0.49f;
-
+    player.alive = false;
     printf("Loading player.. \n");
-
 
     bool modelLoaded = false;
 
@@ -262,11 +197,11 @@ void initPlayer()
 /**
 Initialize the texture using the library bitmap
 */
-void initTextures(void)
+void initTextures()
 {
     printf ("\nLoading grass texture..\n");
     // Load a texture object (256x256 true color)
-    bits = LoadDIBitmap("../../res/grass.bmp", &info);
+    bits = LoadDIBitmap("../../res/grass2.bmp", &info);
     if (bits == (GLubyte *)0)
     {
         printf ("Error loading texture!\n\n");
@@ -306,7 +241,7 @@ void initTextures(void)
 
     printf ("\nLoading grass_cracked texture..\n");
     // Load a texture object (256x256 true color)
-    bits = LoadDIBitmap("../../res/grass_cracked2.bmp", &info);
+    bits = LoadDIBitmap("../../res/grass_cracked3.bmp", &info);
     if (bits == (GLubyte *)0)
     {
         printf ("Error loading texture!\n\n");
@@ -384,8 +319,22 @@ void initTextures(void)
                  0, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
 
     printf("Textures ok.\n\n");
-
 }
+
+void checkCollisions()
+{
+    int colisorX, colisorZ;
+    for (i = 0; i<enemiesLoaded; i++)
+    {
+        colisorX = round(enemies[i].x);
+        colisorZ = round(enemies[i].z);
+
+        if(round(player.x) == colisorX && round(player.z) == colisorZ){
+            player.alive = false;
+            }
+    }
+}
+
 
 /**
 Initialize
@@ -404,9 +353,12 @@ void mainInit()
 
     //initModel();
 
+
     openMap();
 
     initPlayer();
+
+    initEnemies();
 
     initLight();
 
@@ -436,12 +388,16 @@ void renderScene()
     updateCam();
 
     int cont;
-    for (cont=0; cont<modelos_carregados; cont++)
+    for (cont=0; cont<enemiesLoaded; cont++)
     {
-        glPushMatrix();
-        glTranslatef(GLfloat(models[cont].x - 3.5), 0.5, GLfloat(models[cont].z - 3.5));
-        glmDraw(models[cont].model, GLM_SMOOTH | GLM_MATERIAL);
-        glPopMatrix();
+        if(enemies[cont].alive == true)
+        {
+            glPushMatrix();
+            glTranslatef(GLfloat(enemies[cont].x), GLfloat (enemies[cont].y), GLfloat(enemies[cont].z));
+            glScalef(0.55,0.55,0.55);
+            glmDraw(enemies[cont].model, GLM_SMOOTH | GLM_MATERIAL);
+            glPopMatrix();
+        }
     }
 
     glPushMatrix();
@@ -463,18 +419,62 @@ void renderScene()
     renderFloor();
 }
 
+void createCrack(int x, int z) {
+    double fX = sin(roty*PI/180);
+    double fZ = -1 * cos(roty*PI/180);
+
+    int facingX;
+    int facingZ;
+
+    if (fX < -0.5)
+        facingX = -1;
+    else if (fX > 0.5)
+        facingX = 1;
+    else facingX = 0;
+
+    if (fZ < -0.5)
+        facingZ = -1;
+    else if (fZ > 0.5)
+        facingZ = 1;
+    else facingZ = 0;
+
+    for (int i = 1; i < 31; i++) {
+        if (x + i*facingX >= 32 && z + i*facingZ >= 32)
+            return;
+        else {
+            if (mapXZ[x + i*facingX][z + i*facingZ] == 0 || mapXZ[x + i*facingX][z + i*facingZ] == 2 || mapXZ[x + i*facingX][z + i*facingZ] == 3)
+                return;
+            else {
+                mapXZ[x + i*facingX][z + i*facingZ] = 3;
+            }
+        }
+
+    }
+        return;
+}
+
 void updateState()
 {
     int x = round(player.x);
     int z = round(player.z);
 
+    checkCollisions();
+
     if (mapXZ[x][z] == 0)
     {
+        player.alive = false;
         printf("Morreu");
         initPlayer();
     }
 
-
+     if (spacePressed && (!turningRight && !turningLeft)) {
+        printf("\n\n\nX: %d, Z:%d\n",x,z);
+        if (mapXZ[x][z] == 2) {
+            createCrack(x, z);
+        }
+        spacePressed = false;
+    }
+    else spacePressed = false;
 
     if (leftPressed && !turningRight)
     {
@@ -512,8 +512,8 @@ void updateState()
     if (upPressed || downPressed)
     {
 
-        speedX = 0.05 * sin(roty*PI/180);
-        speedZ = -0.05 * cos(roty*PI/180);
+        speedX = 0.1 * sin(roty*PI/180);
+        speedZ = -0.1 * cos(roty*PI/180);
 
         if (upPressed)
         {
@@ -567,7 +567,6 @@ int main(int argc, char **argv)
     Store main window id so that glui can send it redisplay events
     */
     mainWindowId = glutCreateWindow("DigDug");
-
     glutDisplayFunc(mainRender);
 
     glutReshapeFunc(onWindowReshape);

@@ -5,6 +5,7 @@ extern bool upPressed;
 extern bool downPressed;
 extern bool turningRight;
 extern bool turningLeft;
+extern bool spacePressed;
 extern float turning;
 extern bool changecam;
 extern int cam;

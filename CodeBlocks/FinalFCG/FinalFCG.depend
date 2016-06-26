@@ -1083,3 +1083,98 @@
 	<windows.h>
 	"maps.h"
 
+1466882486 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\bitmap.c
+	"bitmap.h"
+	<stdio.h>
+	<stdlib.h>
+	<errno.h>
+
+1466882486 c:\users\maria inez\desktop\documentos pedro\fcg\src\bitmap.h
+	<GL/glut.h>
+	<windows.h>
+	<wingdi.h>
+
+1466896295 c:\users\maria inez\desktop\documentos pedro\fcg\codeblocks\include\gl\glut.h
+	<windows.h>
+	<GL/gl.h>
+	<GL/glu.h>
+
+1466882485 c:\users\maria inez\desktop\documentos pedro\fcg\codeblocks\include\gl\gl.h
+
+1466882485 c:\users\maria inez\desktop\documentos pedro\fcg\codeblocks\include\gl\glu.h
+	<stddef.h>
+	<GL/gl.h>
+
+1466882486 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\glm.cpp
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	"glm.h"
+
+1466882486 c:\users\maria inez\desktop\documentos pedro\fcg\src\glm.h
+	<GLUT/glut.h>
+	<GL/gl.h>
+	<GL/glut.h>
+
+1466882486 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\glmimg.cpp
+	<string.h>
+	<math.h>
+	"Texture.h"
+	<windows.h>
+	<GL/gl.h>
+	"glm.h"
+
+1466882486 c:\users\maria inez\desktop\documentos pedro\fcg\src\texture.h
+	<windows.h>
+	<windowsx.h>
+	<stdlib.h>
+	<stdio.h>
+	<GL/glut.h>
+	<math.h>
+
+1466905229 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\keyboard.cpp
+	"keyboard.h"
+
+1466905229 c:\users\maria inez\desktop\documentos pedro\fcg\src\keyboard.h
+
+1466913655 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\maps.cpp
+	<GL/gl.h>
+	<GL/glut.h>
+	"bitmap.h"
+	<stdio.h>
+	<windows.h>
+	"maps.h"
+
+1466909835 c:\users\maria inez\desktop\documentos pedro\fcg\src\maps.h
+
+1466882486 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\texture.cpp
+	"Texture.h"
+
+1466896295 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\window.cpp
+	<GL/gl.h>
+	<GL/glut.h>
+	"window.h"
+
+1466896295 c:\users\maria inez\desktop\documentos pedro\fcg\src\window.h
+
+1466918297 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\main.cpp
+	<windows.h>
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<GL/gl.h>
+	<GL/glut.h>
+	<math.h>
+	<cmath>
+	"glm.h"
+	"keyboard.h"
+	"window.h"
+	"maps.h"
+	"models.h"
+	"bitmap.h"
+
+1466882486 c:\users\maria inez\desktop\documentos pedro\fcg\src\models.h
+	<stdio.h>
+
