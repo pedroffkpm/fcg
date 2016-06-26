@@ -1147,7 +1147,7 @@
 	<windows.h>
 	"maps.h"
 
-1466922211 c:\users\maria inez\desktop\documentos pedro\fcg\src\maps.h
+1466968720 c:\users\maria inez\desktop\documentos pedro\fcg\src\maps.h
 
 1466882486 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\texture.cpp
 	"Texture.h"
@@ -1159,7 +1159,7 @@
 
 1466896295 c:\users\maria inez\desktop\documentos pedro\fcg\src\window.h
 
-1466928486 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\main.cpp
+1466966296 source:c:\users\maria inez\desktop\documentos pedro\fcg\src\main.cpp
 	<windows.h>
 	<iostream>
 	<stdio.h>

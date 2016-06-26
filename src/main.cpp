@@ -60,7 +60,7 @@ GLubyte     temp;            /* Swapping variable */
 
 float gravity = 0.004;
 
-float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
+float backgroundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
 struct object
 {
@@ -131,7 +131,7 @@ void initLight()
     glEnable(GL_LIGHTING );
     glEnable(GL_LIGHT0);
 
-    GLfloat light_ambient[] = { backgrundColor[0], backgrundColor[1], backgrundColor[2], backgrundColor[3] };
+    GLfloat light_ambient[] = { backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3] };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat light_position0[] = { 4.0, 4.0, 3.0, 1.0 };
@@ -191,7 +191,10 @@ void initPlayer()
 
     if (!modelLoaded)
         printf("Erro ao carregar modelo!\n");
-    else printf("Player Model ok. \n \n \n");
+    else {
+            printf("Player Model ok. \n \n \n");
+            player.alive = true;
+        }
 }
 
 /**
@@ -410,8 +413,8 @@ void checkCollisions()
         if(round(player.x) == colisorX && round(player.z) == colisorZ)
             player.alive = false;
 
-         if (mapXZ[colisorX][colisorZ] == 0)
-        enemies[i].alive = false;
+        if (mapXZ[colisorX][colisorZ] == 0)
+            enemies[i].alive = false;
     }
 }
 
@@ -433,7 +436,6 @@ void mainInit()
 
     //initModel();
 
-
     openMap();
 
     initPlayer();
@@ -451,16 +453,15 @@ void enableFog(void)
     glEnable(GL_FOG);
     glFogf(GL_FOG_MODE,GL_EXP2);
     glFogfv(GL_FOG_COLOR,fog_colour);
-    glFogf(GL_FOG_DENSITY,0.2);
+    glFogf(GL_FOG_DENSITY,0.07);
     glHint(GL_FOG_HINT,GL_NICEST);
-    glFogf(GL_FOG_START, 5);
-    glFogf(GL_FOG_END,100);
+    glFogf(GL_FOG_START, 700);
+    glFogf(GL_FOG_END,1000);
 }
-
 
 void renderScene()
 {
-    glClearColor(backgrundColor[0],backgrundColor[1],backgrundColor[2],backgrundColor[3]);
+    glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // limpar o depth buffer
 
     glMatrixMode(GL_MODELVIEW);
@@ -507,52 +508,58 @@ void moveEnemies()
     int decision;
     for (i = 0; i<enemiesLoaded; i++)
     {
-        if(enemies[i].alive){
-        enemies[i].speedX = 0.07 * sin(enemies[i].roty*PI/180);
-        enemies[i].speedZ = -0.07 * cos(enemies[i].roty*PI/180);
-        decision = rand() % 20;  //decision vai ser  baseado na IA
-        switch(decision)
+        if(enemies[i].alive)
         {
-            break;
-        case 1: //vira à esquerda
-            enemies[i].roty -= 90.0;
-            break;
-        case 2: // vira à direita
-            enemies[i].roty += 90.0;
-        default: //demais casos, segue reto
-            enemies[i].x += enemies[i].speedX;
-            enemies[i].z += enemies[i].speedZ; //speedZ é negativa
-            break;
-        }
+            enemies[i].speedX = 0.07 * sin(enemies[i].roty*PI/180);
+            enemies[i].speedZ = -0.07 * cos(enemies[i].roty*PI/180);
+            decision = rand() % 20;  //decision vai ser  baseado na IA
+            switch(decision)
+            {
+                break;
+            case 1: //vira à esquerda
+                enemies[i].roty -= 90.0;
+                break;
+            case 2: // vira à direita
+                enemies[i].roty += 90.0;
+            default: //demais casos, segue reto
+                enemies[i].x += enemies[i].speedX;
+                enemies[i].z += enemies[i].speedZ; //speedZ é negativa
+                break;
+            }
         }
     }
 
 }
 
-int floodFill(int floodMap[32][32], int x, int z, int target, int replacement) {
+int floodFill(int floodMap[32][32], int x, int z, int target, int replacement)
+{
     if (x >= 32 || z >= 32 || x < 0 || z < 0)
         return 0;
 
     if (floodMap[x][z] == replacement)
         return 0;
 
-    if (floodMap[x][z] == target) {
+    if (floodMap[x][z] == target)
+    {
         floodMap[x][z] = replacement;
         return 1 +
-                floodFill(floodMap, x, z-1, target, replacement) +
-                floodFill(floodMap, x+1, z, target, replacement) +
-                floodFill(floodMap, x, z+1, target, replacement) +
-                floodFill(floodMap, x-1, z, target, replacement);
+               floodFill(floodMap, x, z-1, target, replacement) +
+               floodFill(floodMap, x+1, z, target, replacement) +
+               floodFill(floodMap, x, z+1, target, replacement) +
+               floodFill(floodMap, x-1, z, target, replacement);
     }
 
     return 0;
 }
 
-void updateAreas(int playerX, int playerZ) {
+void updateAreas(int playerX, int playerZ)
+{
     int newMap[32][32];
 
-    for(int x = 0; x < 32; x++) {
-        for (int z = 0; z < 32; z++) {
+    for(int x = 0; x < 32; x++)
+    {
+        for (int z = 0; z < 32; z++)
+        {
             if (mapXZ[x][z] == 1 || mapXZ[x][z] == 4 || mapXZ[x][z] == 5)
                 newMap[x][z] = 1;
             else if (mapXZ[x][z] == 2 || mapXZ[x][z] == 3)
@@ -567,12 +574,16 @@ void updateAreas(int playerX, int playerZ) {
     int maxReplacement = -1;
     int numAreas = 0;
 
-    for(int x = 0; x < 32; x++) {
-        for (int z = 0; z < 32; z++) {
-            if (newMap[x][z] == 1) {
+    for(int x = 0; x < 32; x++)
+    {
+        for (int z = 0; z < 32; z++)
+        {
+            if (newMap[x][z] == 1)
+            {
                 tamArea = floodFill(newMap, x, z, 1, replacement);
                 numAreas++;
-                if (tamArea > maxArea) {
+                if (tamArea > maxArea)
+                {
                     maxArea = tamArea;
                     maxReplacement = replacement;
                 }
@@ -581,28 +592,35 @@ void updateAreas(int playerX, int playerZ) {
         }
     }
 
-    if (numAreas > 1) {
-        for(int x = 0; x < 32; x++) {
-            for (int z = 0; z < 32; z++) {
-                if (newMap[x][z] != maxReplacement && newMap[x][z] < 0) {
+    if (numAreas > 1)
+    {
+        for(int x = 0; x < 32; x++)
+        {
+            for (int z = 0; z < 32; z++)
+            {
+                if (newMap[x][z] != maxReplacement && newMap[x][z] < 0)
+                {
                     mapXZ[x][z] = 0;
                 }
-                else { //ARRUMAR AQUI PARA TIRAR OS PINTOS
-                    if (newMap[x][z] == 2 && z - 1 > 0 && z + 1 < 32 && x - 1 > 0 && x + 1 < 32) {
+                else
+                {
+                    if (newMap[x][z] == 2 && z - 1 > 0 && z + 1 < 32 && x - 1 > 0 && x + 1 < 32)
+                    {
                         if (newMap[x][z-1] != maxReplacement && newMap[x][z-1] < 0)
-                        if (newMap[x][z+1] != maxReplacement && newMap[x][z+1] < 0)
-                        if (newMap[x-1][z] != maxReplacement && newMap[x-1][z] < 0)
-                        if (newMap[x+1][z] != maxReplacement && newMap[x+1][z] < 0)
-                            mapXZ[x][z] = 0;
-                        }
+                            if (newMap[x][z+1] != maxReplacement && newMap[x][z+1] < 0)
+                                if (newMap[x-1][z] != maxReplacement && newMap[x-1][z] < 0)
+                                    if (newMap[x+1][z] != maxReplacement && newMap[x+1][z] < 0)
+                                        mapXZ[x][z] = 0;
                     }
+                }
             }
         }
     }
 
 }
 
-void createCrack(int x, int z) {
+void createCrack(int x, int z)
+{
     double fX = sin(player.roty*PI/180);
     double fZ = -1 * cos(player.roty*PI/180);
 
@@ -621,24 +639,29 @@ void createCrack(int x, int z) {
         facingZ = 1;
     else facingZ = 0;
 
-    for (int i = 1; i < 31; i++) {
-        if (x + i*facingX >= 32 && z + i*facingZ >= 32) {
+    for (int i = 1; i < 31; i++)
+    {
+        if (x + i*facingX >= 32 && z + i*facingZ >= 32)
+        {
             updateAreas(x, z);
             return;
         }
-        else {
-            if (mapXZ[x + i*facingX][z + i*facingZ] == 0 || mapXZ[x + i*facingX][z + i*facingZ] == 2 || mapXZ[x + i*facingX][z + i*facingZ] == 3) {
+        else
+        {
+            if (mapXZ[x + i*facingX][z + i*facingZ] == 0 || mapXZ[x + i*facingX][z + i*facingZ] == 2 || mapXZ[x + i*facingX][z + i*facingZ] == 3)
+            {
                 updateAreas(x, z);
                 return;
             }
-            else {
+            else
+            {
                 mapXZ[x + i*facingX][z + i*facingZ] = 3;
             }
         }
 
     }
     updateAreas(x, z);
-        return;
+    return;
 }
 
 void updateState()
@@ -646,8 +669,10 @@ void updateState()
     int x = round(player.x);
     int z = round(player.z);
 
-     if (spacePressed && (!turningRight && !turningLeft)) {
-        if (mapXZ[x][z] == 2) {
+    if (spacePressed && (!turningRight && !turningLeft))
+    {
+        if (mapXZ[x][z] == 2)
+        {
             createCrack(x, z);
         }
         spacePressed = false;

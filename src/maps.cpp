@@ -10,6 +10,7 @@ boolean opened = false;
 boolean playerLoaded = false;
 int enemiesLoaded = 0;
 int mapXZ[32][32] = { {0} };
+float heightXZ[32][32] = { {0.0f} };
 
 
 GLenum      type;            /* Texture type */
@@ -166,58 +167,38 @@ void renderFloor()
                 glBegin(GL_QUADS);
                 glTexCoord2f(1.0f, 0.0f);   // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, 0.0f, z + 0.5f);
+                glVertex3f(x - 0.5f, heightXZ[x][z], z + 0.5f);
 
                 glTexCoord2f(0.0f, 0.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, 0.0f, z + 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z], z + 0.5f);
 
                 glTexCoord2f(0.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, -1.0f, z + 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z]-1.0f, z + 0.5f);
 
                 glTexCoord2f(1.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, -1.0f, z + 0.5f);
+                glVertex3f(x - 0.5f, heightXZ[x][z]-1.0f, z + 0.5f);
 
                 glEnd();
 
                 glBegin(GL_QUADS);
                 glTexCoord2f(1.0f, 0.0f);   // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, 0.0f, z + 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z], z + 0.5f);
 
                 glTexCoord2f(0.0f, 0.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, 0.0f, z - 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z], z - 0.5f);
 
                 glTexCoord2f(0.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, -1.0f, z - 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z]-1.0f, z - 0.5f);
 
                 glTexCoord2f(1.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, -1.0f, z + 0.5f);
-
-                glEnd();
-
-
-                glBegin(GL_QUADS);
-                glTexCoord2f(1.0f, 0.0f);   // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, 0.0f, z - 0.5f);
-
-                glTexCoord2f(0.0f, 0.0f);  // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, 0.0f, z - 0.5f);
-
-                glTexCoord2f(0.0f, 1.0f);  // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, -1.0f, z - 0.5f);
-
-                glTexCoord2f(1.0f, 1.0f);  // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, -1.0f, z - 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z]-1.0f, z + 0.5f);
 
                 glEnd();
 
@@ -225,19 +206,39 @@ void renderFloor()
                 glBegin(GL_QUADS);
                 glTexCoord2f(1.0f, 0.0f);   // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, 0.0f, z - 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z], z - 0.5f);
 
                 glTexCoord2f(0.0f, 0.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, 0.0f, z + 0.5f);
+                glVertex3f(x - 0.5f, heightXZ[x][z], z - 0.5f);
 
                 glTexCoord2f(0.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, -1.0f, z + 0.5f);
+                glVertex3f(x - 0.5f, heightXZ[x][z]-1.0f, z - 0.5f);
 
                 glTexCoord2f(1.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, -1.0f, z - 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z]-1.0f, z - 0.5f);
+
+                glEnd();
+
+
+                glBegin(GL_QUADS);
+                glTexCoord2f(1.0f, 0.0f);   // coords for the texture
+                glNormal3f(0.0f,1.0f,0.0f);
+                glVertex3f(x - 0.5f, heightXZ[x][z], z - 0.5f);
+
+                glTexCoord2f(0.0f, 0.0f);  // coords for the texture
+                glNormal3f(0.0f,1.0f,0.0f);
+                glVertex3f(x - 0.5f, heightXZ[x][z], z + 0.5f);
+
+                glTexCoord2f(0.0f, 1.0f);  // coords for the texture
+                glNormal3f(0.0f,1.0f,0.0f);
+                glVertex3f(x - 0.5f, heightXZ[x][z]-1.0f, z + 0.5f);
+
+                glTexCoord2f(1.0f, 1.0f);  // coords for the texture
+                glNormal3f(0.0f,1.0f,0.0f);
+                glVertex3f(x - 0.5f, heightXZ[x][z]-1.0f, z - 0.5f);
 
                 glEnd();
             }
@@ -248,19 +249,19 @@ void renderFloor()
                 glBegin(GL_QUADS);
                 glTexCoord2f(1.0f, 0.0f);   // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, 0.0f, z + 0.5f);
+                glVertex3f(x - 0.5f, heightXZ[x][z], z + 0.5f);
 
                 glTexCoord2f(0.0f, 0.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, 0.0f, z + 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z], z + 0.5f);
 
                 glTexCoord2f(0.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, 0.0f, z - 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z], z - 0.5f);
 
                 glTexCoord2f(1.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, 0.0f, z - 0.5f);
+                glVertex3f(x - 0.5f, heightXZ[x][z], z - 0.5f);
 
                 glEnd();
             }
@@ -271,19 +272,19 @@ void renderFloor()
                 glBegin(GL_QUADS);
                 glTexCoord2f(1.0f, 0.0f);   // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, 0.0f, z + 0.5f);
+                glVertex3f(x - 0.5f, heightXZ[x][z], z + 0.5f);
 
                 glTexCoord2f(0.0f, 0.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, 0.0f, z + 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z], z + 0.5f);
 
                 glTexCoord2f(0.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x + 0.5f, 0.0f, z - 0.5f);
+                glVertex3f(x + 0.5f, heightXZ[x][z], z - 0.5f);
 
                 glTexCoord2f(1.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(x - 0.5f, 0.0f, z - 0.5f);
+                glVertex3f(x - 0.5f, heightXZ[x][z], z - 0.5f);
 
                 glEnd();
             }
