@@ -1026,12 +1026,12 @@
 	<GL/glut.h>
 	<math.h>
 
-1466900855 source:c:\users\matheus\fcg\src\keyboard.cpp
+1466976935 source:c:\users\matheus\fcg\src\keyboard.cpp
 	"keyboard.h"
 
-1466900855 c:\users\matheus\fcg\src\keyboard.h
+1466976935 c:\users\matheus\fcg\src\keyboard.h
 
-1466904847 source:c:\users\matheus\fcg\src\main.cpp
+1466991605 source:c:\users\matheus\fcg\src\main.cpp
 	<windows.h>
 	<iostream>
 	<stdio.h>
@@ -1045,7 +1045,6 @@
 	"window.h"
 	"maps.h"
 	"models.h"
-	<al/alut.h>
 	"bitmap.h"
 
 1466896215 c:\users\matheus\fcg\src\window.h
@@ -1073,9 +1072,9 @@
 	<GL/glut.h>
 	"window.h"
 
-1466901763 c:\users\matheus\fcg\src\maps.h
+1466976935 c:\users\matheus\fcg\src\maps.h
 
-1466903058 source:c:\users\matheus\fcg\src\maps.cpp
+1466991737 source:c:\users\matheus\fcg\src\maps.cpp
 	<GL/gl.h>
 	<GL/glut.h>
 	"bitmap.h"

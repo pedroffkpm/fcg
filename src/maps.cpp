@@ -69,18 +69,25 @@ void openMap()
         int color = (ptr[2] << 16) + (ptr[1] << 8) + ptr[0];
         if (color == 0x8000ff)
         {
-            mapXZ[xpos][zpos] = 2;
+            if (mapXZ[xpos][zpos] == 1)
+                mapXZ[xpos][zpos] = 2;
+            else printf("Você tentou carregar um buraco onde não existe chão!\n");
         }
         if (color == 0x804000)
         {
-            mapXZ[xpos][zpos] = 3;
+            if (mapXZ[xpos][zpos] == 1)
+                mapXZ[xpos][zpos] = 3;
+            else printf("Você tentou carregar uma rachadura onde não existe chão!\n");
         }
         if (color == 0x0000ff)
         {
             if(playerLoaded == false)
             {
-                mapXZ[xpos][zpos] = 4;
-                playerLoaded = true;
+                if (mapXZ[xpos][zpos] == 1) {
+                    mapXZ[xpos][zpos] = 4;
+                    playerLoaded = true;
+                }
+                else printf("Você tentou carregar um player onde não existe chão!\n");
             }
             else printf("Você tentou carregar mais de um jogador!\n");
         }
@@ -88,8 +95,11 @@ void openMap()
         {
             if(enemiesLoaded < 4)
             {
-                mapXZ[xpos][zpos] = 5;
-                enemiesLoaded++;
+                if (mapXZ[xpos][zpos] == 1) {
+                    mapXZ[xpos][zpos] = 5;
+                    enemiesLoaded++;
+                }
+                else printf("Você tentou carregar um inimigo onde não existe chão!\n");
             }
             else printf("Você tentou carregar mais de 4 inimigos!\n");
         }

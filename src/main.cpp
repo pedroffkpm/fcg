@@ -58,7 +58,10 @@ GLubyte     temp;            /* Swapping variable */
 // parte de código extraído de "texture.c" por Michael Sweet (OpenGL SuperBible)
 // texture buffers and stuff
 
-float gravity = 0.004;
+float gravity = 0.03;
+bool won = false;
+
+float airBombDelay = 2.0;
 
 float backgroundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
@@ -72,6 +75,7 @@ struct object
     float speedZ = 0.0f;
     float roty = 0.0f;
     bool alive = true;
+    bool falling = false;
 } enemies[4], player;
 
 // Aux function to load the object using GLM and apply some functions
@@ -107,14 +111,14 @@ void updateCam()
 
     if(cam == 0)
     {
-        gluLookAt(player.x + 0.05f * sin(player.roty*PI/180), 0.9, player.z - 0.05f * cos(player.roty*PI/180),
-                  player.x + sin(player.roty*PI/180), 0.6, player.z - cos(player.roty*PI/180),
+        gluLookAt(player.x + 0.05f * sin(player.roty*PI/180), player.y + 0.41f, player.z - 0.05f * cos(player.roty*PI/180), //0.9
+                  player.x + sin(player.roty*PI/180), player.y + 0.11f, player.z - cos(player.roty*PI/180), //0.6
                   0.0,1.0, 0.0);
     }
     if(cam == 1)
     {
         gluLookAt(player.x - 3.0f * sin(player.roty*PI/180), player.y + 1.0f, player.z + 3.0f * cos(player.roty*PI/180),
-                  player.x + sin(player.roty*PI/180), 0.9f, player.z - cos(player.roty*PI/180),
+                  player.x + sin(player.roty*PI/180), player.y + 0.41f, player.z - cos(player.roty*PI/180),
                   0.0,1.0, 0.0);
     }
     if (cam == 2)
@@ -181,7 +185,7 @@ void initPlayer()
             }
 
     player.y = 0.49f;
-    player.alive = false;
+    player.alive = true;
     printf("Loading player.. \n");
 
     bool modelLoaded = false;
@@ -194,7 +198,6 @@ void initPlayer()
     else
     {
         printf("Player Model ok. \n \n \n");
-        player.alive = true;
     }
 }
 
@@ -406,19 +409,27 @@ void initTextures()
 void checkCollisions()
 {
     int colisorX, colisorZ;
+    int playerX = round(player.x);
+    int playerZ = round(player.z);
+
     for (i = 0; i<enemiesLoaded; i++)
     {
         colisorX = round(enemies[i].x);
         colisorZ = round(enemies[i].z);
 
-        if(round(player.x) == colisorX && round(player.z) == colisorZ)
+        if(playerX == colisorX && playerZ == colisorZ) {
             player.alive = false;
+        }
 
-        if (mapXZ[colisorX][colisorZ] == 0)
-            enemies[i].alive = false;
+        if(mapXZ[playerX][playerZ] == 0) {
+            player.falling = true;
+        }
+
+        if (mapXZ[colisorX][colisorZ] == 0) {
+            enemies[i].falling = true;
+        }
     }
 }
-
 
 /**
 Initialize
@@ -460,6 +471,66 @@ void enableFog(void)
     glFogf(GL_FOG_END,1000);
 }
 
+void printGameOver() {
+    char gameOver[10];
+    sprintf(gameOver, "GameOver!");
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glOrtho(0,3000,0,3000,0,80000);
+
+    glMatrixMode(GL_MODELVIEW);
+
+    glPushMatrix();
+    glLoadIdentity();
+
+    glRasterPos2f(0, 0);
+    int len, i;
+    len = (int)strlen(gameOver);
+
+    for (i = 0; i < len; i++)
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, gameOver[i]);
+
+    glPopMatrix();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+}
+
+void printYouWon() {
+    char youWon[8];
+    sprintf(youWon, "YouWon!");
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glOrtho(0,3000,0,3000,0,80000);
+
+    glMatrixMode(GL_MODELVIEW);
+
+    glPushMatrix();
+    glLoadIdentity();
+
+    glRasterPos2f(0, 0);
+    int len, i;
+    len = (int)strlen(youWon);
+
+    for (i = 0; i < len; i++)
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, youWon[i]);
+
+    glPopMatrix();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+}
+
 void renderScene()
 {
     glClearColor(backgroundColor[0],backgroundColor[1],backgroundColor[2],backgroundColor[3]);
@@ -489,77 +560,186 @@ void renderScene()
     glRotatef(-(player.roty+180), 0.0, 1.0, 0.0);
     glmDraw(player.model, GLM_SMOOTH | GLM_MATERIAL);
     glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(GLfloat(4), GLfloat(player.y), GLfloat(4));
-    glScalef(0.5, 0.5, 0.5);
-    glmDraw(player.model, GLM_SMOOTH | GLM_MATERIAL);
-    glPopMatrix();
-
     // binds the bmp file already loaded to the OpenGL parameters
 
+        if (!player.alive)
+    {
+        printGameOver();
+    }
+
+    won = true;
+    for (i = 0; i < enemiesLoaded; i++)
+    {  if (enemies[i].alive){
+           won = false;
+           break;
+        }
+    }
+
+    if(won)
+        printYouWon();
 
     renderFloor();
     renderWater();
 }
 
-//int makeDecision()
-//{
-//    int decision;
-//    int enemfacX, enemfacZ, pfacX, pfacZ;
-//    float enemfX, enemfZ, pfX, pfZ;
-//
-//    double fX = sin(player.roty*PI/180);
-//    double fZ = -1 * cos(player.roty*PI/180);
-//
-//    int facingX;
-//    int facingZ;
-//
-//    if (fX < -0.5)
-//        facingX = -1;
-//    else if (fX > 0.5)
-//        facingX = 1;
-//    else facingX = 0;
-//
-//    if (fZ < -0.5)
-//        facingZ = -1;
-//    else if (fZ > 0.5)
-//        facingZ = 1;
-//    else facingZ = 0;
-//
-//    for(int i = 0; i<enemiesLoaded;i++)
-//        if(fabs(enemies[i].x - player.x) <= 4.0f)
-//
-//
-//    return decision;
-//}
+int makeDecision(int i)
+{
+    float distanceX = fabs((enemies[i].x - player.x));
+    float distanceZ = fabs((enemies[i].z - player.z));
+
+    int enemyX = round(enemies[i].x);
+    int enemyZ = round(enemies[i].z);
+
+    enemies[i].speedX = 0;
+    enemies[i].speedZ = 0;
+
+    int decision;
+
+
+    /**
+    decision = 1 -> diminuir X do inimigo
+    decision = 2 -> aumentar X do inimigo
+    decision = -1 -> diminuir Z do inimigo
+    decision = -2 -> aumentar Z do inimigo
+    */
+
+    if(distanceX > distanceZ) {
+        if (enemies[i].x > player.x)
+            decision = 1;
+        else decision = 2;
+    }
+    else {
+        if (enemies[i].z > player.z)
+            decision = -1;
+        else decision = -2;
+    }
+
+    switch(decision)
+    {
+        case 1:
+            if(enemyX - 1 >= 0){
+                if (mapXZ[enemyX - 1][enemyZ] != 0 && mapXZ[enemyX - 1][enemyZ] != 2 && mapXZ[enemyX - 1][enemyZ] != 3)
+                    enemies[i].speedX = -0.07;
+            }
+            break;
+        case 2:
+            if(enemyX + 1 < 32) {
+                if (mapXZ[enemyX + 1][enemyZ] != 0 && mapXZ[enemyX + 1][enemyZ] != 2 && mapXZ[enemyX + 1][enemyZ] != 3)
+                    enemies[i].speedX = 0.07;
+            }
+            break;
+        case -1:
+            if(enemyZ - 1 >= 0) {
+                if (mapXZ[enemyX][enemyZ - 1] != 0 && mapXZ[enemyX][enemyZ - 1] != 2 && mapXZ[enemyX][enemyZ - 1] != 3)
+                    enemies[i].speedZ = -0.07;
+            }
+            break;
+        case -2:
+            if(enemyZ + 1 < 32) {
+                if (mapXZ[enemyX][enemyZ + 1] != 0 && mapXZ[enemyX][enemyZ + 1] != 2 && mapXZ[enemyX][enemyZ + 1] != 3)
+                    enemies[i].speedZ = 0.07;
+            }
+            break;
+        default:
+            break;
+    }
+
+
+
+    //printf("SpeedX: %f, SpeedZ: %f\n", enemies[i].speedX, enemies[i].speedZ);
+    enemies[i].x += enemies[i].speedX;
+    enemies[i].z += enemies[i].speedZ;
+
+
+
+}
 
 void moveEnemies()
 {
     int decision;
-    for (i = 0; i<enemiesLoaded; i++)
+    bool blocked;
+
+
+    int enemyX, enemyZ;
+    for (i = 0; i < enemiesLoaded; i++)
     {
-        if(enemies[i].alive)
+        if(enemies[i].alive && ( (fabs((enemies[i].x - player.x)) > 4.0) || (fabs((enemies[i].z - player.z)) > 4.0)))
         {
-            enemies[i].speedX = 0.07 * sin(enemies[i].roty*PI/180);
-            enemies[i].speedZ = -0.07 * cos(enemies[i].roty*PI/180);
-            decision = rand() % 100;  //decision vai ser  baseado na IA
+            blocked = true;
+            double fX = sin(enemies[i].roty*PI/180);
+            double fZ = -1 * cos(enemies[i].roty*PI/180);
+
+            enemyX = round(enemies[i].x);
+            enemyZ = round(enemies[i].z);
+
+            enemies[i].speedX = 0.07 * fX;
+            enemies[i].speedZ = 0.07 * fZ;
+
+            if (fX > 0.5 && enemyX + 1 < 32)
+                if (mapXZ[enemyX + 1][enemyZ] != 0 && mapXZ[enemyX + 1][enemyZ] != 2 && mapXZ[enemyX + 1][enemyZ] != 3)
+                        blocked = false;
+            if (fX < -0.5 && enemyX - 1 >= 0)
+                if (mapXZ[enemyX - 1][enemyZ] != 0 && mapXZ[enemyX - 1][enemyZ] != 2 && mapXZ[enemyX - 1][enemyZ] != 3)
+                        blocked = false;
+            if (fZ > 0.5 && enemyZ + 1 < 32)
+                if (mapXZ[enemyX][enemyZ + 1] != 0 && mapXZ[enemyX][enemyZ + 1] != 2 && mapXZ[enemyX][enemyZ + 1] != 3)
+                        blocked = false;
+            if (fZ < -0.5 && enemyZ - 1 >= 0)
+                if (mapXZ[enemyX][enemyZ - 1] != 0 && mapXZ[enemyX][enemyZ - 1] != 2 && mapXZ[enemyX][enemyZ - 1] != 3)
+                        blocked = false;
+
+            if (blocked)
+                decision = rand() % 3;
+            else decision = rand() % 100;
+
             switch(decision)
             {
             case 0: // fica parado
                 break;
             case 1: //vira à esquerda
-                enemies[i].roty -= 90.0;
+                if (fX < -0.5)
+                    if (enemyZ + 1 < 32)
+                        if (mapXZ[enemyX][enemyZ + 1] != 0 && mapXZ[enemyX][enemyZ + 1] != 2 && mapXZ[enemyX][enemyZ + 1] != 3)
+                            enemies[i].roty -= 90.0;
+                if (fX > 0.5)
+                    if (enemyZ - 1 >= 0)
+                        if (mapXZ[enemyX][enemyZ - 1] != 0 && mapXZ[enemyX][enemyZ - 1] != 2 && mapXZ[enemyX][enemyZ - 1] != 3)
+                            enemies[i].roty -= 90.0;
+                if (fZ < -0.5)
+                    if (enemyX - 1 >= 0)
+                        if (mapXZ[enemyX - 1][enemyZ] != 0 && mapXZ[enemyX - 1][enemyZ] != 2 && mapXZ[enemyX - 1][enemyZ] != 3)
+                            enemies[i].roty -= 90.0;
+                if (fZ > 0.5)
+                    if (enemyX + 1 < 32)
+                        if (mapXZ[enemyX + 1][enemyZ] != 0 && mapXZ[enemyX + 1][enemyZ] != 2 && mapXZ[enemyX + 1][enemyZ] != 3)
+                            enemies[i].roty -= 90.0;
                 break;
             case 2: // vira à direita
-                enemies[i].roty += 90.0;
+                if (fX > 0.5)
+                    if (enemyZ + 1 < 32)
+                        if (mapXZ[enemyX][enemyZ + 1] != 0 && mapXZ[enemyX][enemyZ + 1] != 2 && mapXZ[enemyX][enemyZ + 1] != 3)
+                            enemies[i].roty += 90.0;
+                if (fX < -0.5)
+                    if (enemyZ - 1 >= 0)
+                        if (mapXZ[enemyX][enemyZ - 1] != 0 && mapXZ[enemyX][enemyZ - 1] != 2 && mapXZ[enemyX][enemyZ - 1] != 3)
+                            enemies[i].roty += 90.0;
+                if (fZ > 0.5)
+                    if (enemyX - 1 >= 0)
+                        if (mapXZ[enemyX - 1][enemyZ] != 0 && mapXZ[enemyX - 1][enemyZ] != 2 && mapXZ[enemyX - 1][enemyZ] != 3)
+                            enemies[i].roty += 90.0;
+                if (fZ < -0.5)
+                    if (enemyX + 1 < 32)
+                        if (mapXZ[enemyX + 1][enemyZ] != 0 && mapXZ[enemyX + 1][enemyZ] != 2 && mapXZ[enemyX + 1][enemyZ] != 3)
+                            enemies[i].roty += 90.0;
                 break;
             default: //demais casos, segue reto
-                enemies[i].x += enemies[i].speedX;
-                enemies[i].z += enemies[i].speedZ; //speedZ é negativa
+                    enemies[i].x += enemies[i].speedX;
+                    enemies[i].z += enemies[i].speedZ;
                 break;
             }
         }
+        else if (enemies[i].alive)
+            makeDecision(i);
     }
 
 }
@@ -702,6 +882,7 @@ void blowEnemy()
     double fX = sin(player.roty*PI/180);
     double fZ = -1 * cos(player.roty*PI/180);
 
+    printf("FX: %f, FZ: %f, X: %f, Z: %f\n", fX, fZ, player.x, player.z);
     int facingX;
     int facingZ;
 
@@ -717,20 +898,49 @@ void blowEnemy()
         facingZ = 1;
     else facingZ = 0;
 
-    for(int r = 0; r < enemiesLoaded; r++)
-        if(enemies[r].alive){
-            if ((round(player.x + fX) == round(enemies[r].x)) && (abs(round(enemies[r].z) - round(player.z)) <= 4))
-                    enemies[r].z += 0.65f*facingX;
-
-            if ((round(player.z + fZ) == round(enemies[r].z)) && (abs(round(enemies[r].x) - round(player.x)) <= 4))
-                    enemies[r].x += 0.65*facingZ;
-    }
+    int playerX = round(player.x);
+    int playerZ = round(player.z);
+    int enemieX;
+    int enemieZ;
+        for(int i = 0; i < enemiesLoaded; i++) {
+            if(enemies[i].alive) {
+                enemieX = round(enemies[i].x);
+                enemieZ = round(enemies[i].z);
+                if (facingX != 0 && (playerZ == enemieZ) && (fabs((enemies[i].x - player.x)) <= 2.0)) {
+                    enemies[i].x += 1.0f*facingX;
+                }
+                if (facingZ != 0 && (playerX == enemieX) && (fabs((enemies[i].z - player.z)) <= 2.0)) {
+                    enemies[i].z += 1.0f*facingZ;
+                }
+            }
+        }
+        airBombDelay = 0;
 }
 
 void updateState()
 {
     int x = round(player.x);
     int z = round(player.z);
+
+    if (airBombDelay <= 2.0)
+        airBombDelay += 0.030;
+
+    //printf("AirBombDelay = %f\n", airBombDelay);
+
+    for(int i = 0; i < enemiesLoaded; i++) {
+        if(enemies[i].falling && enemies[i].alive) {
+            enemies[i].y -= gravity;
+        if (enemies[i].y <= -1.5) {
+            enemies[i].alive = false;
+        }
+        }
+    }
+
+    if (player.falling && player.alive) {
+        player.y -= gravity;
+        if (player.y <= -1.5)
+            player.alive = false;
+    }
 
     if (spacePressed && (!turningRight && !turningLeft))
     {
@@ -744,13 +954,9 @@ void updateState()
 
     checkCollisions();
 
-    if (mapXZ[x][z] == 0)
-    {
-        player.alive = false;
-    }
-
-    if(fPressed)
+    if(fPressed && airBombDelay >= 2.0) {
         blowEnemy();
+    }
 
     if (spacePressed && (!turningRight && !turningLeft))
     {
@@ -813,7 +1019,8 @@ void updateState()
         }
 
     }
-    //moveEnemies();
+
+    moveEnemies();
 }
 
 /**
@@ -821,10 +1028,13 @@ Render scene
 */
 void mainRender()
 {
-    updateState();
+    if (player.alive && !won) {
+        updateState();
+    }
     renderScene();
     glFlush();
     glutPostRedisplay();
+
     Sleep(30);
 }
 
